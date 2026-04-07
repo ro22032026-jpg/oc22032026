@@ -279,33 +279,15 @@
         <label for="inputApto">Apartamento</label>
         <select id="inputApto">
           <option value="">Selecione seu apartamento</option>
-          <optgroup label="1º Andar">
-            <option>101</option><option>102</option><option>103</option><option>104</option>
-          </optgroup>
-          <optgroup label="2º Andar">
-            <option>201</option><option>202</option><option>203</option><option>204</option>
-          </optgroup>
-          <optgroup label="3º Andar">
-            <option>301</option><option>302</option><option>303</option><option>304</option>
-          </optgroup>
-          <optgroup label="4º Andar">
-            <option>401</option><option>402</option><option>403</option><option>404</option>
-          </optgroup>
-          <optgroup label="5º Andar">
-            <option>501</option><option>502</option><option>503</option><option>504</option>
-          </optgroup>
-          <optgroup label="6º Andar">
-            <option>601</option><option>602</option><option>603</option><option>604</option>
-          </optgroup>
-          <optgroup label="7º Andar">
-            <option>701</option><option>702</option><option>703</option><option>704</option>
-          </optgroup>
-          <optgroup label="8º Andar">
-            <option>801</option><option>802</option><option>803</option><option>804</option>
-          </optgroup>
-          <optgroup label="Cobertura">
-            <option>Cobertura 01</option>
-          </optgroup>
+          <option>101</option><option>102</option><option>103</option><option>104</option>
+          <option>201</option><option>202</option><option>203</option><option>204</option>
+          <option>301</option><option>302</option><option>303</option><option>304</option>
+          <option>401</option><option>402</option><option>403</option><option>404</option>
+          <option>501</option><option>502</option><option>503</option><option>504</option>
+          <option>602</option><option>603</option><option>604</option>
+          <option>701</option><option>702</option><option>703</option><option>704</option>
+          <option>801</option><option>802</option><option>803</option><option>804</option>
+          <option>Cobertura 01</option>
         </select>
         <span class="field-error">Selecione seu apartamento.</span>
       </div>
@@ -434,18 +416,18 @@ async function acessar() {
   document.getElementById('infoIp').textContent   = ipUsuario || 'não disponível';
   document.getElementById('infoTs').textContent   = ts;
 
-  // Vídeo
-  const video = document.getElementById('videoEl');
-  video.src = 'video.mp4';
-  video.load();
-  video.play().catch(() => {});
-
   // Troca tela
   document.getElementById('formCard').style.display = 'none';
   document.getElementById('playerCard').classList.add('active');
 
   // Marca d'água
   iniciarWatermark(nome, apto, ipUsuario, ts);
+
+  // Vídeo — só após o card estar visível
+  const video = document.getElementById('videoEl');
+  video.src = 'video.mp4';
+  video.load();
+  video.addEventListener('canplay', () => video.play().catch(() => {}), { once: true });
 }
 
 function iniciarWatermark(nome, apto, ip, ts) {
