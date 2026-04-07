@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acesso</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0b0c10;
+      --surface:    #13151a;
+      --surface2:   #181b24;
+      --border:     #1f2230;
+      --accent:     #c9374a;
+      --accent-dim: #7a1f2b;
+      --accent-glow:#c9374a44;
+      --text:       #e8eaf0;
+      --muted:      #6b7080;
+      --mono:       'DM Mono', monospace;
+      --sans:       'Sora', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp .4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-body {
+      padding: 40px 36px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .form-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .form-header p  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+
+    .field select option,
+    .field select optgroup { background: #1a1d28; color: var(--text); }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .field input::placeholder { color: var(--muted); }
+
+    .field-error {
+      font-size: 12px;
+      color: #ff6b7a;
+      font-family: var(--mono);
+      display: none;
+    }
+    .field.has-error input,
+    .field.has-error select  { border-color: var(--accent); }
+    .field.has-error .field-error { display: block; }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      margin-top: 4px;
+    }
+    .btn:hover   { background: #e0404f; box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn:active  { transform: scale(.98); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .legal {
+      padding: 14px 36px;
+      background: #0d0e14;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-family: var(--mono);
+    }
+    .legal strong { color: #ff8a95; }
+
+    /* ── Player ── */
+    .player-card {
+      width: 100%;
+      max-width: 800px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      animation: fadeUp .4s ease both;
+    }
+    .player-card.active { display: block; }
+
+    .player-wrap {
+      position: relative;
+      background: #000;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    #videoEl {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    #watermarkCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .player-shield { position: absolute; inset: 0; z-index: 9; }
+
+    .access-info {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .info-item { display: flex; flex-direction: column; gap: 3px; }
+    .info-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .info-value { font-family: var(--mono); font-size: 13px; color: var(--text); }
+
+    .player-legal {
+      padding: 12px 24px;
+      background: #0d0e14;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-family: var(--mono);
+    }
+    .player-legal strong { color: #ff8a95; }
+
+    /* Loading */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11,12,16,.85);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .loading-overlay.active { display: flex; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay p { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+
+    @media (max-width: 480px) {
+      .form-body { padding: 28px 20px 24px; }
+      .legal, .player-legal { padding: 12px 20px; }
+      .access-info { padding: 12px 16px; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <p>Registrando acesso…</p>
+</div>
+
+<div class="page">
+
+  <!-- Formulário -->
+  <div class="card" id="formCard">
+    <div class="form-body">
+      <div class="form-header">
+        <h1>Identificação</h1>
+        <p>Preencha os dados para acessar o vídeo.</p>
+      </div>
+
+      <div class="field" id="field-nome">
+        <label for="inputNome">Nome completo</label>
+        <input type="text" id="inputNome" placeholder="Seu nome completo" autocomplete="off" />
+        <span class="field-error">Informe seu nome e sobrenome.</span>
+      </div>
+
+      <div class="field" id="field-apto">
+        <label for="inputApto">Apartamento</label>
+        <select id="inputApto">
+          <option value="">Selecione seu apartamento</option>
+          <optgroup label="1º Andar">
+            <option>101</option><option>102</option><option>103</option><option>104</option>
+          </optgroup>
+          <optgroup label="2º Andar">
+            <option>201</option><option>202</option><option>203</option><option>204</option>
+          </optgroup>
+          <optgroup label="3º Andar">
+            <option>301</option><option>302</option><option>303</option><option>304</option>
+          </optgroup>
+          <optgroup label="4º Andar">
+            <option>401</option><option>402</option><option>403</option><option>404</option>
+          </optgroup>
+          <optgroup label="5º Andar">
+            <option>501</option><option>502</option><option>503</option><option>504</option>
+          </optgroup>
+          <optgroup label="6º Andar">
+            <option>601</option><option>602</option><option>603</option><option>604</option>
+          </optgroup>
+          <optgroup label="7º Andar">
+            <option>701</option><option>702</option><option>703</option><option>704</option>
+          </optgroup>
+          <optgroup label="8º Andar">
+            <option>801</option><option>802</option><option>803</option><option>804</option>
+          </optgroup>
+          <optgroup label="Cobertura">
+            <option>Cobertura 01</option>
+          </optgroup>
+        </select>
+        <span class="field-error">Selecione seu apartamento.</span>
+      </div>
+
+      <button class="btn" id="btnAcessar" onclick="acessar()">Acessar vídeo</button>
+    </div>
+
+    <div class="legal">
+      <strong>⚠ AVISO:</strong> O acesso é nominal e intransferível.
+      Seu nome, apartamento e IP ficam registrados permanentemente
+      neste vídeo durante toda a visualização.
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div class="player-card" id="playerCard">
+    <div class="player-wrap">
+      <video id="videoEl" controls controlslist="nodownload nofullscreen" disablePictureInPicture oncontextmenu="return false" playsinline style="width:100%;height:100%;display:block;"></video>
+      <canvas id="watermarkCanvas"></canvas>
+      <div class="player-shield" oncontextmenu="return false"></div>
+    </div>
+
+    <div class="access-info">
+      <div class="info-item">
+        <span class="info-label">Nome</span>
+        <span class="info-value" id="infoNome">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Apartamento</span>
+        <span class="info-value" id="infoApto">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">IP</span>
+        <span class="info-value" id="infoIp">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Acesso em</span>
+        <span class="info-value" id="infoTs">—</span>
+      </div>
+    </div>
+
+    <div class="player-legal">
+      <strong>⚠ AVISO:</strong> Este vídeo é de acesso estritamente pessoal e intransferível.
+      Seu nome, apartamento e IP estão visíveis nesta gravação em tempo real.
+      Qualquer reprodução ou compartilhamento é de sua <strong>exclusiva responsabilidade legal</strong>.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCuR5SwD-IG64P1vKlpmUqvhWf5-xZNS1B7vo4-pzTWVVgT0CODufsud-f3J2P7nsJ/exec';
+
+// ============================================================
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (
+    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+    e.key === 'F12' ||
+    (e.ctrlKey && e.key === 'u') ||
+    (e.ctrlKey && e.key === 's')
+  ) e.preventDefault();
+});
+
+let ipUsuario = '';
+fetch('https://api.ipify.org?format=json')
+  .then(r => r.json())
+  .then(d => { ipUsuario = d.ip || ''; })
+  .catch(() => {});
+
+function validarForm() {
+  let ok = true;
+  const nome = document.getElementById('inputNome').value.trim();
+  const fieldNome = document.getElementById('field-nome');
+  const partes = nome.split(/\s+/).filter(p => p.length > 0);
+  if (partes.length < 2 || partes.some(p => p.length < 2)) { fieldNome.classList.add('has-error'); ok = false; }
+  else fieldNome.classList.remove('has-error');
+
+  const apto = document.getElementById('inputApto').value;
+  const fieldApto = document.getElementById('field-apto');
+  if (!apto) { fieldApto.classList.add('has-error'); ok = false; }
+  else fieldApto.classList.remove('has-error');
+
+  return ok;
+}
+
+function jsonpCall(params, cbName) {
+  return new Promise((resolve, reject) => {
+    window[cbName] = data => {
+      resolve(data);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    };
+    const qs = new URLSearchParams({ ...params, callback: cbName }).toString();
+    const script = document.createElement('script');
+    script.src = `${APPS_SCRIPT_URL}?${qs}`;
+    script.onerror = () => reject(new Error('Falha'));
+    document.head.appendChild(script);
+    setTimeout(() => reject(new Error('Timeout')), 15000);
+  });
+}
+
+async function acessar() {
+  if (!validarForm()) return;
+
+  const nome = document.getElementById('inputNome').value.trim();
+  const apto = document.getElementById('inputApto').value;
+  const agora = new Date();
+  const ts = agora.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('btnAcessar').disabled = true;
+
+  // Registra no Apps Script (não bloqueia se falhar)
+  try {
+    await jsonpCall({ acao: 'registrar', nome, apartamento: apto, ip: ipUsuario }, 'cb_reg');
+  } catch(_) {}
+
+  document.getElementById('loading').classList.remove('active');
+
+  // Info
+  document.getElementById('infoNome').textContent = nome;
+  document.getElementById('infoApto').textContent = apto;
+  document.getElementById('infoIp').textContent   = ipUsuario || 'não disponível';
+  document.getElementById('infoTs').textContent   = ts;
+
+  // Vídeo
+  const video = document.getElementById('videoEl');
+  video.src = 'video.mp4';
+  video.load();
+  video.play().catch(() => {});
+
+  // Troca tela
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('playerCard').classList.add('active');
+
+  // Marca d'água
+  iniciarWatermark(nome, apto, ipUsuario, ts);
+}
+
+function iniciarWatermark(nome, apto, ip, ts) {
+  const canvas = document.getElementById('watermarkCanvas');
+  const video  = document.getElementById('videoEl');
+  const ctx    = canvas.getContext('2d');
+
+  const linha1 = `${nome}  ·  Apt ${apto}`;
+  const linha2 = `IP: ${ip || 'n/d'}  ·  ${ts}`;
+
+  let posX = 40, posY = 40;
+  let dirX = 1,  dirY = 1;
+  const SPEED = 0.25;
+
+  function resize() {
+    canvas.width  = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const fontSize = Math.max(14, canvas.width * 0.026);
+    ctx.font = `500 ${fontSize}px 'DM Mono', monospace`;
+    ctx.textBaseline = 'top';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur  = 8;
+
+    // Principal
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillText(linha1, posX, posY);
+    ctx.fillText(linha2, posX, posY + fontSize + 5);
+
+    // Espelhada
+    const w1 = ctx.measureText(linha1).width;
+    const mx = canvas.width  - w1 - posX * 0.6;
+    const my = canvas.height - posY - fontSize * 2 - 10;
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillText(linha1, mx, my);
+    ctx.fillText(linha2, mx, my + fontSize + 5);
+
+    ctx.shadowBlur = 0;
+
+    // Movimento
+    const maxX = canvas.width  - ctx.measureText(linha1).width - 20;
+    const maxY = canvas.height - fontSize * 2 - 20;
+    posX += dirX * SPEED;
+    posY += dirY * SPEED;
+    if (posX <= 10 || posX >= maxX) dirX *= -1;
+    if (posY <= 10 || posY >= maxY) dirY *= -1;
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+</script>
+</body>
+</html>
