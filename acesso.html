@@ -271,8 +271,8 @@
 
       <div class="field" id="field-nome">
         <label for="inputNome">Nome completo</label>
-        <input type="text" id="inputNome" placeholder="Seu nome completo" autocomplete="off" />
-        <span class="field-error">Informe seu nome completo.</span>
+        <input type="text" id="inputNome" placeholder="Nome e sobrenome" autocomplete="off" />
+        <span class="field-error">Informe nome e sobrenome.</span>
       </div>
 
       <div class="field" id="field-apto">
@@ -382,7 +382,7 @@ function validarForm() {
   let ok = true;
   const nome = document.getElementById('inputNome').value.trim();
   const fieldNome = document.getElementById('field-nome');
-  if (nome.length < 3) { fieldNome.classList.add('has-error'); ok = false; }
+  if (nome.split(' ').filter(p => p.length > 1).length < 2) { fieldNome.classList.add('has-error'); ok = false; }
   else fieldNome.classList.remove('has-error');
 
   const apto = document.getElementById('inputApto').value;
